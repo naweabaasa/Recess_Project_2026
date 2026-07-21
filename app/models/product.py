@@ -1,4 +1,4 @@
-rom app.extensions import db
+from app.extensions import db
 
 class Product(db.Model):
     __tablename__ = "products"
