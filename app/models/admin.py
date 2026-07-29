@@ -1,41 +1,68 @@
-from app.extensions import db, bcrypt
+from app.extensions import db, bcrypt    # Imports the database instance and Bcrypt for password hashing.
 
+
+# Creates a junction table for the many-to-many relationship between roles and permissions.
 role_permissions = db.Table(
-    "role_permissions",
-    db.Column("role_id", db.Integer, db.ForeignKey("roles.id"), primary_key=True),
-    db.Column("permission_id", db.Integer, db.ForeignKey("permissions.id"), primary_key=True),
-)
+    "role_permissions",                                             # Name of the junction table.
+    db.Column("role_id", db.Integer, db.ForeignKey("roles.id"), primary_key=True),      # Stores the ID of a role.
+    db.Column("permission_id", db.Integer, db.ForeignKey("permissions.id"), primary_key=True),    # Stores the ID of a permission.
+)     
 
-class Role(db.Model):
-    __tablename__ = "roles"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    permissions = db.relationship("Permission", secondary=role_permissions, lazy="joined")
 
+# Represents user roles and their assigned permissions.
+class Role(db.Model):                                               # Defines the Role model.
+    __tablename__ = "roles"                                         # Database table name.
+    id = db.Column(db.Integer, primary_key=True)                    # Unique identifier for each role.
+    name = db.Column(db.String(50), unique=True, nullable=False)    # Stores the role name (e.g., Admin, Manager).
+    permissions = db.relationship("Permission", secondary=role_permissions, lazy="joined")     # Links each role to its permissions.
+
+    # Converts the role object into a dictionary.
     def to_dict(self):
-        return {"id": self.id, "name": self.name, "permissions": [p.code for p in self.permissions]}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "permissions": [p.code for p in self.permissions]
+        }
 
-class Permission(db.Model):
-    __tablename__ = "permissions"
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(80), unique=True, nullable=False)
 
-class Admin(db.Model):
-    __tablename__ = "admins"
-    id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(120))
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255))
-    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
-    role = db.relationship("Role")
-    is_active = db.Column(db.Boolean, default=True)
 
-    def set_password(self, raw):
+# Represents actions that a role is allowed to perform.
+class Permission(db.Model):                                          # Defines the Permission model.
+    __tablename__ = "permissions"                                    # Database table name.
+    id = db.Column(db.Integer, primary_key=True)                     # Unique identifier for each permission.
+    code = db.Column(db.String(80), unique=True, nullable=False)     # Stores the permission code (e.g., create_product).
+
+
+
+# Represents administrator accounts, including authentication, role assignment, and password management
+class Admin(db.Model):                                               # Defines the Admin model.
+    __tablename__ = "admins"                                         # Database table name.
+    id = db.Column(db.Integer, primary_key=True)                     # Unique identifier for each admin.
+    full_name = db.Column(db.String(120))                            # Stores the admin's full name.
+    email = db.Column(db.String(120), unique=True, nullable=False)   # Stores the admin's email address.
+    password_hash = db.Column(db.String(255))                        # Stores the encrypted password.
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))       # References the admin's role.
+    role = db.relationship("Role")                                   # Creates a relationship between Admin and Role.
+    is_active = db.Column(db.Boolean, default=True)                  # Indicates whether the admin account is active.
+
+
+
+    # Hashes and stores the password.
+    def set_password(self, raw):      
         self.password_hash = bcrypt.generate_password_hash(raw).decode("utf-8")
 
-    def check_password(self, raw):
+
+    # Checks if the entered password matches the stored hash.
+    def check_password(self, raw):    
         return bcrypt.check_password_hash(self.password_hash, raw)
 
+
+    # Converts the admin object into a dictionary.
     def to_dict(self):
-        return {"id": self.id, "full_name": self.full_name, "email": self.email,
-                "role": self.role.name if self.role else None, "is_active": self.is_active}
+        return {
+            "id": self.id,
+            "full_name": self.full_name,
+            "email": self.email,
+            "role": self.role.name if self.role else None,
+            "is_active": self.is_active
+        }
