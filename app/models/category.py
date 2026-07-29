@@ -1,11 +1,18 @@
-from app.extensions import db
+from app.extensions import db   # Imports the database instance.
 
-class Category(db.Model):
-    __tablename__ = "categories"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    description = db.Column(db.String(255))
-    status = db.Column(db.String(20), default="active")
+# Represents a product category in the database.
+class Category(db.Model):                                          # Defines the Category model.
+    __tablename__ = "categories"                                   # Database table name.
+    id = db.Column(db.Integer, primary_key=True)                   # Unique identifier for each category.
+    name = db.Column(db.String(100), unique=True, nullable=False)  # Stores the category name (must be unique).
+    description = db.Column(db.String(255))                        # Stores a brief description of the category.
+    status = db.Column(db.String(20), default="active")            # Stores the category status (defaults to "active").
 
+     # Converts the category object into a dictionaryfor API responses.
     def to_dict(self):
-        return {"id": self.id, "name": self.name, "description": self.description, "status": self.status}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "status": self.status
+        }
