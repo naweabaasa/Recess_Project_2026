@@ -9,6 +9,14 @@ class Customer(db.Model):                                            # Defines t
     password_hash = db.Column(db.String(255))                        # Stores the encrypted password.
     address = db.Column(db.String(255))                              # Stores the customer's address.
 
+    def __init__(self, full_name=None, email=None, phone_number=None, password_hash=None, address=None):
+        self.full_name = full_name
+        self.email = email
+        self.phone_number = phone_number
+        if password_hash is not None:
+            self.password_hash = password_hash
+        self.address = address
+
 
     # Hashes and stores the customer's password.
     def set_password(self, raw):
