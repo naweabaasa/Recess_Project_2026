@@ -45,6 +45,16 @@ class Admin(db.Model):                                               # Defines t
     role = db.relationship("Role")                                   # Creates a relationship between Admin and Role.
     is_active = db.Column(db.Boolean, default=True)                  # Indicates whether the admin account is active.
 
+    def __init__(self, full_name=None, email=None, password_hash=None, role_id=None, role=None, is_active=True):
+        self.full_name = full_name
+        self.email = email
+        if password_hash is not None:
+            self.password_hash = password_hash
+        self.role_id = role_id
+        if role is not None:
+            self.role = role
+        self.is_active = is_active
+
 
 
     # Hashes and stores the password.
