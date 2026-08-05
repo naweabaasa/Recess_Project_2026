@@ -9,6 +9,13 @@ class Payment(db.Model):                                                        
     status = db.Column(db.String(20), default="pending")                           # Stores the payment status (defaults to "pending").
     transaction_reference = db.Column(db.String(120))                              # Stores the payment transaction reference number.
 
+    def __init__(self, order_id=None, payment_method=None, amount_paid=None, status="pending", transaction_reference=None):
+        self.order_id = order_id
+        self.payment_method = payment_method
+        self.amount_paid = amount_paid
+        self.status = status
+        self.transaction_reference = transaction_reference
+
     # Converts the payment object into a dictionary.
     def to_dict(self):
         return {
