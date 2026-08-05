@@ -1,0 +1,4 @@
+[tool.pyrefly]
+project-includes = ["app/**/*.py", "config.py", "run.py", "seed.py"]
+project-excludes = ["**/venv/**", "**/__pycache__/**", "**/migrations/**"]
+search_path = ["."]
