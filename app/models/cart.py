@@ -7,6 +7,9 @@ class ShoppingCart(db.Model):                                                   
     customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"), unique=True)      # Links the cart to a customer (one cart per customer).
     items = db.relationship("CartItem", backref="cart", cascade="all, delete-orphan")    # Creates a relationship with CartItem and deletes items when the cart is deleted.
 
+    def __init__(self, customer_id=None):
+        self.customer_id = customer_id
+
     # Converts the shopping cart object into a dictionary.
     def to_dict(self):
         return {
@@ -24,6 +27,11 @@ class CartItem(db.Model):                                                  # Def
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"))       # Links the item to a product.
     product = db.relationship("Product")                                   # Creates a relationship with the Product model.
     quantity = db.Column(db.Integer, default=1)                            # Stores the quantity of the product in the cart.
+
+    def __init__(self, cart_id=None, product_id=None, quantity=1):
+        self.cart_id = cart_id
+        self.product_id = product_id
+        self.quantity = quantity
 
 
     # Converts the cart item object into a dictionary.
