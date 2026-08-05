@@ -1,4 +1,4 @@
-# Admin login 
+# Admin login
 from flask import Blueprint, request, jsonify
 # Blueprint creates a group of routes,
 # request receives data from the client,
@@ -14,7 +14,7 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
 # Handles admin login and generates an access token.
-@auth_bp.route("/login", methods=["POST"])    
+@auth_bp.route("/login", methods=["POST"])
 def login():
 
     data = request.get_json() or {}                                 # Get login details sent by the user.
@@ -24,22 +24,22 @@ def login():
     # If login fails, return an error message.
     if not admin or not admin.check_password(data.get("password", "")):
         return jsonify({"error": "Invalid email or password"}), 401
-    
+
     # Creates extra information stored inside the JWT token.
     # Includes admin role and assigned permissions.
     claims = {
-        "role": admin.role.name, 
+        "role": admin.role.name,
         "permissions": [p.code for p in admin.role.permissions]
-        }
+    }
 
     # Generate JWT access token using admin ID as identity.
     token = create_access_token(
-        identity=str(admin.id), 
+        identity=str(admin.id),
         additional_claims=claims
-        )  
+    )
 
-     # Return admin details and login token
+    # Return admin details and login token
     return jsonify({
-        "admin": admin.to_dict(), 
+        "admin": admin.to_dict(),
         "access_token": token
-        }), 200
+    }), 200
