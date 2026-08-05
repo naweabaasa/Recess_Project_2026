@@ -15,6 +15,14 @@ class Order(db.Model):                                                  # Define
     payment = db.relationship("Payment", backref="order", uselist=False)                  # Creates a one-to-one relationship with the payment.
     delivery = db.relationship("Delivery", backref="order", uselist=False)                # Creates a one-to-one relationship with the delivery.
 
+    def __init__(self, customer_id=None, order_date=None, total_amount=0, status="pending", delivery_address=None):
+        self.customer_id = customer_id
+        if order_date is not None:
+            self.order_date = order_date
+        self.total_amount = total_amount
+        self.status = status
+        self.delivery_address = delivery_address
+
 
     #Converts the order object into a dictionary.
     def to_dict(self, with_children=False):
@@ -41,6 +49,13 @@ class OrderItem(db.Model):                                             # Databas
     quantity = db.Column(db.Integer)                                   # Stores the quantity of the product ordered.
     unit_price = db.Column(db.Numeric(10, 2))                          # Stores the price of one unit of the product.
     sub_total = db.Column(db.Numeric(10, 2))                           # Stores the total cost for this item (quantity × unit price).
+
+    def __init__(self, order_id=None, product_id=None, quantity=None, unit_price=None, sub_total=None):
+        self.order_id = order_id
+        self.product_id = product_id
+        self.quantity = quantity
+        self.unit_price = unit_price
+        self.sub_total = sub_total
 
     # Converts the order item object into a dictionary.
     def to_dict(self):
