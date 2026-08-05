@@ -8,6 +8,11 @@ class Category(db.Model):                                          # Defines the
     description = db.Column(db.String(255))                        # Stores a brief description of the category.
     status = db.Column(db.String(20), default="active")            # Stores the category status (defaults to "active").
 
+    def __init__(self, name=None, description=None, status="active"):
+        self.name = name
+        self.description = description
+        self.status = status
+
      # Converts the category object into a dictionaryfor API responses.
     def to_dict(self):
         return {
