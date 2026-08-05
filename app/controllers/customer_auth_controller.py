@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify  # Import Flask tools
 # request receives client data,s
 # jsonify returns JSON responses.
 
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity   # Import JWT function
+from flask_jwt_extended import create_access_token   # Import JWT function
 
 from app.extensions import db          # Import database connection.# create_access_token creates login tokens,
 # jwt_required protects private routes,
@@ -24,7 +24,7 @@ def register():
 
     data = request.get_json() or {}                # Get registration data from request body.
     customer = Customer(                           # Create a new customer.
-        full_name=data.get("full_name"), 
+        full_name=data.get("full_name"),
         email=data.get("email"),
         phone_number=data.get("phone_number"),
         address=data.get("address"),
@@ -42,10 +42,9 @@ def register():
 
     # Return customer details and login token.
     return jsonify({
-        "customer": customer.to_dict(), 
+        "customer": customer.to_dict(),
         "access_token": token
     }), 201
-
 
 
 # Authenticates an existing customer.
@@ -55,22 +54,23 @@ def login():
     data = request.get_json() or {}                                             # Get login information.
     customer = Customer.query.filter_by(email=data.get("email")).first()        # Find customer using email.
 
-    if not customer or not customer.check_password(data.get("password", "")):    # Check if customer exists and password is correct.
+    # Check if customer exists and password is correct.
+    if not customer or not customer.check_password(data.get("password", "")):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    token = create_access_token(identity=str(customer.id))                        # Create JWT token after successful login.
+    # Create JWT token after successful login.
+    token = create_access_token(identity=str(customer.id))
     return jsonify({                                                              # Return customer details and access token.
-        "customer": customer.to_dict(), 
+        "customer": customer.to_dict(),
         "access_token": token
-    }), 200    
-
+    }), 200
 
 
 # Returns the profile of the logged-in customer.
 @customer_bp.route("/me", methods=["GET"])
-@jwt_required()
 def me():
 
-    customer = Customer.query.get_or_404(get_jwt_identity())                   # Get customer ID from JWT token and find the customer record.
+    # Default customer ID (no authentication).
+    customer = Customer.query.get_or_404(1)
 
     return jsonify(customer.to_dict()), 200    # Return customer profile information.
