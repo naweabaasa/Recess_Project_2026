@@ -10,6 +10,13 @@ class Delivery(db.Model):                                                       
     status = db.Column(db.String(20), default="pending")                        # Stores the delivery status (defaults to "pending").
     delivery_fee = db.Column(db.Numeric(10, 2), default=0)                      # Stores the delivery fee.
 
+    def __init__(self, order_id=None, delivery_address=None, delivery_date=None, status="pending", delivery_fee=0):
+        self.order_id = order_id
+        self.delivery_address = delivery_address
+        self.delivery_date = delivery_date
+        self.status = status
+        self.delivery_fee = delivery_fee
+
     # Converts the delivery object into a dictionary.
     def to_dict(self):
         return {
