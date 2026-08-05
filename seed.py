@@ -8,7 +8,7 @@
 
 from app import create_app            # Import function that creates and configures the Flask application.
 from app.extensions import db         # Import database connection.
-from app.models import Role, Permission, Admin, Category    # Import database models.
+from app.models import Role, Permission, Admin, Category, Brand    # Import database models.
 
 
 # List of system permissions.
@@ -16,6 +16,7 @@ from app.models import Role, Permission, Admin, Category    # Import database mo
 PERMISSIONS = [
     "manage_admins", 
     "manage_categories", 
+    "manage_brands",
     "manage_products",
     "manage_orders", 
     "manage_payments", 
@@ -27,7 +28,8 @@ PERMISSIONS = [
 ROLES = {
     "super_admin": [],
     "catalog_manager": [
-        "manage_categories", 
+        "manage_categories",
+        "manage_brands",
         "manage_products"
     ],
     "order_manager": [
@@ -89,6 +91,17 @@ def run():
             # Add category only if it does not already exist.
             if not Category.query.filter_by(name=name).first():
                 db.session.add(Category(name=name))
+
+        # Create default product brands.
+        for name in [
+            "BreadWise Bakery", 
+            "SunRise Bakes", 
+            "Golden Grain"
+        ]:
+            
+            # Add brand only if it does not already exist.
+            if not Brand.query.filter_by(name=name).first():
+                db.session.add(Brand(name=name))
 
         # Save all database changes.        
         db.session.commit()
