@@ -1,18 +1,45 @@
-# Admin login 
+# Admin login
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
-from app.models import Admin
+# Blueprint creates a group of routes,
+# request receives data from the client,
+# jsonify returns JSON responses
 
+from flask_jwt_extended import create_access_token   # Creates JWT authentication tokens.
+
+from app.models import Admin  # Import Admin database model.
+
+
+# Creating authentication Blueprint.
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
+
+# Handles admin login and generates an access token.
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    data = request.get_json() or {}
-    admin = Admin.query.filter_by(email=data.get("email")).first()
 
+    data = request.get_json() or {}                                 # Get login details sent by the user.
+    admin = Admin.query.filter_by(email=data.get("email")).first()  # Find admin account using the provided email.
+
+    # Check if admin exists and password is correct.
+    # If login fails, return an error message.
     if not admin or not admin.check_password(data.get("password", "")):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    claims = {"role": admin.role.name, "permissions": [p.code for p in admin.role.permissions]}
-    token = create_access_token(identity=str(admin.id), additional_claims=claims)
-    return jsonify({"admin": admin.to_dict(), "access_token": token}), 200
+    # Creates extra information stored inside the JWT token.
+    # Includes admin role and assigned permissions.
+    claims = {
+        "role": admin.role.name,
+        "permissions": [p.code for p in admin.role.permissions]
+    }
+
+    # Generate JWT access token using admin ID as identity.
+    token = create_access_token(
+        identity=str(admin.id),
+        additional_claims=claims
+    )
+
+    # Return admin details and login token
+    return jsonify({
+        "admin": admin.to_dict(),
+        "access_token": token
+    }), 200
