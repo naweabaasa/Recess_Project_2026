@@ -2,6 +2,8 @@ from app.models.admin import Admin, Role, Permission  # Imports the Admin, Role,
 
 from app.models.category import Category  # Imports the Category model.
 
+from app.models.brand import Brand  # Imports the Brand model.
+
 from app.models.product import Product    # Imports the Product model.
 
 from app.models.customer import Customer    # Imports the Customer model.
