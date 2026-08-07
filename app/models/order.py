@@ -12,7 +12,6 @@ class Order(db.Model):                                                  # Define
     status = db.Column(db.String(20), default="pending")                # Stores the current order status (defaults to "pending").
     delivery_address = db.Column(db.String(255))                        # Stores the delivery address for the order.
     items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan")   # Creates a relationship with all items in the order.
-    payment = db.relationship("Payment", backref="order", uselist=False)                  # Creates a one-to-one relationship with the payment.
     delivery = db.relationship("Delivery", backref="order", uselist=False)                # Creates a one-to-one relationship with the delivery.
 
     def __init__(self, customer_id=None, order_date=None, total_amount=0, status="pending", delivery_address=None):
@@ -30,10 +29,9 @@ class Order(db.Model):                                                  # Define
                 "total_amount": str(self.total_amount), "status": self.status,
                 "delivery_address": self.delivery_address}
         
-        # Includes related items, payment, and delivery details if requested.
+        # Includes related items and delivery details if requested.
         if with_children:    
             data["items"] = [i.to_dict() for i in self.items]
-            data["payment"] = self.payment.to_dict() if self.payment else None
             data["delivery"] = self.delivery.to_dict() if self.delivery else None
         return data   # Returns the order data.
 

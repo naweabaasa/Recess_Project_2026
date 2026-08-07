@@ -19,7 +19,6 @@ PERMISSIONS = [
     "manage_brands",
     "manage_products",
     "manage_orders", 
-    "manage_payments", 
     "manage_delivery",
 ]
 
@@ -34,7 +33,6 @@ ROLES = {
     ],
     "order_manager": [
         "manage_orders", 
-        "manage_payments", 
         "manage_delivery"
     ],
 }

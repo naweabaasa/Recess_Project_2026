@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify  # Import Flask tools
 # request receives client data,s
 # jsonify returns JSON responses.
 
-from flask_jwt_extended import create_access_token   # Import JWT function
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity   # Import JWT function
 
 from app.extensions import db          # Import database connection.# create_access_token creates login tokens,
 # jwt_required protects private routes,
@@ -68,9 +68,9 @@ def login():
 
 # Returns the profile of the logged-in customer.
 @customer_bp.route("/me", methods=["GET"])
+@jwt_required()
 def me():
-
-    # Default customer ID (no authentication).
-    customer = Customer.query.get_or_404(1)
+    customer_id = int(get_jwt_identity())  # Get logged-in customer ID from JWT token
+    customer = Customer.query.get_or_404(customer_id)
 
     return jsonify(customer.to_dict()), 200    # Return customer profile information.

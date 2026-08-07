@@ -6,11 +6,12 @@ from flask import Blueprint, request, jsonify  # Import Flask tools
 # request receives client data,
 # jsonify returns JSON responses.
 
-
+from flask_jwt_extended import jwt_required, get_jwt_identity  # Import JWT functions
 
 from app.extensions import db      # Import database connection.
 
 from app.models import Order, OrderItem, ShoppingCart     # Import order-related database model
+from app.utils.decorators import permission_required  # Import permission decorator
 
 
 # Create Order Blueprint.
@@ -19,9 +20,9 @@ order_bp = Blueprint("orders", __name__, url_prefix="/api/orders")
 
 # Converts the customer's cart into an order.
 @order_bp.route("/checkout", methods=["POST"])
+@jwt_required()
 def checkout():
-
-    customer_id = 1  # Default customer ID (no authentication).
+    customer_id = int(get_jwt_identity())  # Get logged-in customer ID from JWT token
     cart = ShoppingCart.query.filter_by(customer_id=customer_id).first()   # Find customer's shopping cart.
 
     if not cart or not cart.items:                        # Check if cart exists and has items.
@@ -62,25 +63,37 @@ def checkout():
 
 # Displays all orders belonging to the logged-in customer.
 @order_bp.route("", methods=["GET"])
+@jwt_required()
 def my_orders():
-
+    customer_id = int(get_jwt_identity())  # Get logged-in customer ID from JWT token
     orders = Order.query.filter_by(                      # Get customer's orders from database.
-        customer_id=1  # Default customer ID (no authentication).
+        customer_id=customer_id
     ).all()
     return jsonify([o.to_dict() for o in orders]), 200    # Return orders list.
 
 
 # Shows details of a specific order.
 @order_bp.route("/<int:order_id>", methods=["GET"])
+@jwt_required()
 def order_detail(order_id):
-
+    # SECURITY FIX: Get the logged-in customer's ID from JWT token
+    customer_id = int(get_jwt_identity())
+    
     order = Order.query.get_or_404(order_id)                  # Find order by ID or return 404.
+    
+    # IMPORTANT SECURITY CHECK: Make sure this order belongs to the logged-in customer
+    # Without this check, any customer could view anyone else's orders!
+    if order.customer_id != customer_id:
+        # Return 403 Forbidden if the order doesn't belong to this customer
+        return jsonify({"error": "You don't have permission to view this order"}), 403
+    
     return jsonify(order.to_dict(with_children=True)), 200    # Return order details including items.
 
 
 # Updates the status of an order.
 # Only users with "manage_orders" permission can access.
 @order_bp.route("/<int:order_id>/status", methods=["PUT"])
+@permission_required("manage_orders")
 def update_status(order_id):
 
     order = Order.query.get_or_404(order_id)                         # Find order by ID.

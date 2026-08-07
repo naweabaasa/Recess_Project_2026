@@ -8,6 +8,8 @@ from app.extensions import db               # Import database connection.
 
 from app.models import Category          # Import Category database model.
 
+from app.utils.decorators import permission_required  # Import permission decorator
+
 
 
 # Create Category Blueprint.
@@ -17,12 +19,14 @@ category_bp = Blueprint("categories", __name__, url_prefix="/api/categories")
 # Retrieves all categories.
 # Only users with "manage_categories" permission can access.
 @category_bp.route("", methods=["GET"])
+@permission_required("manage_categories")
 def list_categories():
     return jsonify([c.to_dict() for c in Category.query.all()]), 200
 
 
 # Creates a new product category.
 @category_bp.route("", methods=["POST"])
+@permission_required("manage_categories")
 def create_category():
 
     data = request.get_json() or {}              # Get category data from request body.
@@ -42,6 +46,7 @@ def create_category():
 
 # Updates an existing category.
 @category_bp.route("/<int:category_id>", methods=["PUT"])
+@permission_required("manage_categories")
 def update_category(category_id):
 
     category = Category.query.get_or_404(category_id)     # Find category by ID or return 404 if not found.
@@ -58,6 +63,7 @@ def update_category(category_id):
 
 # Deletes a category from the database.
 @category_bp.route("/<int:category_id>", methods=["DELETE"])
+@permission_required("manage_categories")
 def delete_category(category_id):
 
     category = Category.query.get_or_404(category_id)        # Find category by ID or return 404.

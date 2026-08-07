@@ -19,5 +19,4 @@ To ensure correct foreign key relationships, the database tables must be migrate
 10. `products` (depends on `categories`, `brands`, `admins`)
 11. `cart_items` (depends on `shopping_carts`, `products`)
 12. `order_items` (depends on `orders`, `products`)
-13. `payments` (depends on `orders`)
-14. `deliveries` (depends on `orders`)
+13. `deliveries` (depends on `orders`)

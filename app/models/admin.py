@@ -1,4 +1,5 @@
 from app.extensions import db, bcrypt    # Imports the database instance and Bcrypt for password hashing.
+from datetime import datetime  # Import datetime to record when admins are created/updated
 
 
 # Creates a junction table for the many-to-many relationship between roles and permissions.
@@ -44,6 +45,14 @@ class Admin(db.Model):                                               # Defines t
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))       # References the admin's role.
     role = db.relationship("Role")                                   # Creates a relationship between Admin and Role.
     is_active = db.Column(db.Boolean, default=True)                  # Indicates whether the admin account is active.
+    
+    # TIMESTAMP FIELDS: Track when admin accounts are created and updated
+    # Important for security audits - knowing when accounts were created/modified
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    # Automatically set to current time when admin is created
+    
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    # Automatically update to current time when admin info is modified
 
     def __init__(self, full_name=None, email=None, password_hash=None, role_id=None, role=None, is_active=True):
         self.full_name = full_name
@@ -74,5 +83,8 @@ class Admin(db.Model):                                               # Defines t
             "full_name": self.full_name,
             "email": self.email,
             "role": self.role.name if self.role else None,
-            "is_active": self.is_active
+            "is_active": self.is_active,
+            # Include timestamps in the response
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

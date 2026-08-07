@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify  # Import Flask tools
 from app.extensions import db               # Import database connection
 from app.models import Brand, Product       # Import Brand & Product database models
+from app.utils.decorators import permission_required  # Import permission decorator
 
 
 # Create Brand Blueprint
@@ -11,6 +12,7 @@ brand_bp = Blueprint("brands", __name__, url_prefix="/api/brands")
 # Retrieves all brands.
 # Accessible by admin/management or users with "manage_brands" or "manage_products" permission.
 @brand_bp.route("", methods=["GET"])
+@permission_required("manage_brands", "manage_products")
 def list_brands():
     brands = Brand.query.all()
     return jsonify([b.to_dict() for b in brands]), 200
@@ -18,6 +20,7 @@ def list_brands():
 
 # Retrieves a single brand by ID.
 @brand_bp.route("/<int:brand_id>", methods=["GET"])
+@permission_required("manage_brands", "manage_products")
 def get_brand(brand_id):
     brand = Brand.query.get_or_404(brand_id)
     return jsonify(brand.to_dict()), 200
@@ -25,6 +28,7 @@ def get_brand(brand_id):
 
 # Creates a new product brand.
 @brand_bp.route("", methods=["POST"])
+@permission_required("manage_brands")
 def create_brand():
     data = request.get_json(silent=True) or {}      # Safely parse request JSON
 
@@ -54,6 +58,7 @@ def create_brand():
 
 # Updates an existing brand.
 @brand_bp.route("/<int:brand_id>", methods=["PUT"])
+@permission_required("manage_brands")
 def update_brand(brand_id):
     brand = Brand.query.get_or_404(brand_id)     # Find brand by ID or return 404
 
@@ -85,6 +90,7 @@ def update_brand(brand_id):
 
 # Deletes a brand from the database.
 @brand_bp.route("/<int:brand_id>", methods=["DELETE"])
+@permission_required("manage_brands")
 def delete_brand(brand_id):
     brand = Brand.query.get_or_404(brand_id)     # Find brand by ID or return 404
 

@@ -12,8 +12,6 @@ from app.models.cart import ShoppingCart, CartItem   # Imports the ShoppingCart 
 
 from app.models.order import Order, OrderItem  # Imports the Order and OrderItem models.
 
-from app.models.payment import Payment       # Imports the Payment model.
-
 from app.models.delivery import Delivery  # Imports the Delivery model
 
 

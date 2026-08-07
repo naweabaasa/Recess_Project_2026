@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.extensions import db    # Import database connection.
 from app.models import Delivery    # Import Delivery database model.
+from app.utils.decorators import permission_required  # Import permission decorator
 
 
 # Create Delivery Blueprint.
@@ -10,6 +11,7 @@ delivery_bp = Blueprint("deliveries", __name__, url_prefix="/api/deliveries")
 # Retrieves all delivery records.
 # Requires "manage_delivery" permission.
 @delivery_bp.route("", methods=["GET"])
+@permission_required("manage_delivery")
 def list_deliveries():
 
     # Return all deliveries as JSON.
@@ -18,6 +20,7 @@ def list_deliveries():
 
 # Creates a new delivery record.
 @delivery_bp.route("", methods=["POST"])
+@permission_required("manage_delivery")
 def create_delivery():
 
     data = request.get_json() or {}                      # Get delivery data from request body.
@@ -35,6 +38,7 @@ def create_delivery():
 
 # Updates an existing delivery status and date.
 @delivery_bp.route("/<int:delivery_id>", methods=["PUT"])
+@permission_required("manage_delivery")
 def update_delivery(delivery_id):
 
     delivery = Delivery.query.get_or_404(delivery_id)       # Find delivery by ID or return 404 if not found.

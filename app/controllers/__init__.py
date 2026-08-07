@@ -8,7 +8,6 @@ from app.controllers.brand_controller import brand_bp           # Handles produc
 from app.controllers.product_controller import product_bp         # Handles product management
 from app.controllers.cart_controller import cart_bp               # Handles shopping cart features
 from app.controllers.order_controller import order_bp             # Handles order processing
-from app.controllers.payment_controller import payment_bp         # Handles payment operations
 from app.controllers.delivery_controller import delivery_bp       # Handles delivery management
 from app.controllers.public_controller import public_bp           # Handles public pages/routes
 
@@ -17,5 +16,5 @@ from app.controllers.public_controller import public_bp           # Handles publ
 # This makes it easier to register all routes in the main Flask application.
 all_blueprints = [
     auth_bp, customer_bp, admin_bp, category_bp, brand_bp, product_bp,
-    cart_bp, order_bp, payment_bp, delivery_bp, public_bp,
+    cart_bp, order_bp, delivery_bp, public_bp,
 ]

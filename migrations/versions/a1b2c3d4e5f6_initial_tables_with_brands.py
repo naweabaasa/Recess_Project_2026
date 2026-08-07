@@ -156,20 +156,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
 
-    # 13. payments (references orders)
-    op.create_table('payments',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('order_id', sa.Integer(), nullable=True),
-    sa.Column('payment_method', sa.String(length=50), nullable=True),
-    sa.Column('amount_paid', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('status', sa.String(length=20), nullable=True),
-    sa.Column('transaction_reference', sa.String(length=120), nullable=True),
-    sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('order_id')
-    )
-
-    # 14. deliveries (references orders)
+    # 13. deliveries (references orders)
     op.create_table('deliveries',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=True),
@@ -187,7 +174,6 @@ def upgrade():
 def downgrade():
     # ### Drop in reverse dependency order ###
     op.drop_table('deliveries')
-    op.drop_table('payments')
     op.drop_table('order_items')
     op.drop_table('cart_items')
     op.drop_table('products')
