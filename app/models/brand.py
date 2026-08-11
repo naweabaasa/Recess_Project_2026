@@ -6,7 +6,6 @@ class Brand(db.Model):                                             # Defines the
     __tablename__ = "brands"                                       # Database table name.
     id = db.Column(db.Integer, primary_key=True)                   # Unique identifier for each brand.
     name = db.Column(db.String(100), unique=True, nullable=False)  # Stores the brand name (must be unique).
-    description = db.Column(db.String(255))                        # Stores a brief description of the brand.
     logo_url = db.Column(db.String(255))                           # Stores logo image URL of the brand.
     status = db.Column(db.String(20), default="active")            # Stores the brand status (defaults to "active").
     
@@ -18,9 +17,8 @@ class Brand(db.Model):                                             # Defines the
     # Automatically update to current time when brand is modified
 
     # Constructor to initialize a Brand object.
-    def __init__(self, name, description=None, logo_url=None, status="active"):
+    def __init__(self, name, logo_url=None, status="active"):
         self.name = name
-        self.description = description
         self.logo_url = logo_url
         self.status = status
 
@@ -29,7 +27,6 @@ class Brand(db.Model):                                             # Defines the
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description,
             "logo_url": self.logo_url,
             "status": self.status,
             # Include timestamps in the response

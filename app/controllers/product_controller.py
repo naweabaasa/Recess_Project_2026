@@ -36,7 +36,6 @@ def create_product():
         category_id=data.get("category_id"),
         brand_id=data.get("brand_id"),
         description=data.get("description"),
-        price=data.get("price"),
         image_url=data.get("image_url"),
         status=data.get("status", "draft"),
         admin_id=admin_id,  # Use the real admin ID from JWT token (audit trail!)
@@ -78,7 +77,6 @@ def update_product(product_id):
         "category_id",
         "brand_id",
         "description",
-        "price",
         "image_url",
         "status"
     ]:

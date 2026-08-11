@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 # Blueprint creates routes,
 # jsonify returns JSON responses.
 
-from app.models import Category, Brand, Product  # Import database models.
+from app.models import Category, Brand, Product, PageContent  # Import database models.
 
 
 # Create Public Blueprint.
@@ -41,6 +41,13 @@ def product_detail(product_id):
         Product.query.get_or_404(product_id).to_dict()
     ), 200   # Find product by ID or return 404 if not found.
 
+# Get page content for a specific public page (e.g. home, about)
+@public_bp.route("/pages/<page_name>", methods=["GET"])
+def get_page_content(page_name):
+    contents = PageContent.query.filter_by(page_name=page_name).all()
+    # Return as a dictionary mapping section keys to content
+    result = {c.section_key: c.content for c in contents}
+    return jsonify(result), 200
 
 # This controller manages public access routes for customers.
 # It allows anyone to view active product categories, active products, and details of a specific product without logging in.

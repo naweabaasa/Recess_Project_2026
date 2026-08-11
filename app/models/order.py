@@ -1,65 +1,41 @@
 from app.extensions import db   # Imports the database instance.
-
 from datetime import datetime  # Imports the datetime module to record the order date.
 
-# Represents a customer's order
-class Order(db.Model):                                                  # Defines the Order model.
-    __tablename__ = "orders"                                            # Database table name.
-    id = db.Column(db.Integer, primary_key=True)                        # Unique identifier for each order.
-    customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"))  # Links the order to a customer.
-    order_date = db.Column(db.DateTime, default=datetime.utcnow)        # Stores the date and time the order was created.
-    total_amount = db.Column(db.Numeric(10, 2), default=0)              # Stores the total cost of the order.
-    status = db.Column(db.String(20), default="pending")                # Stores the current order status (defaults to "pending").
-    delivery_address = db.Column(db.String(255))                        # Stores the delivery address for the order.
-    items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan")   # Creates a relationship with all items in the order.
-    delivery = db.relationship("Delivery", backref="order", uselist=False)                # Creates a one-to-one relationship with the delivery.
+# Represents a customer's order placed via the frontend form
+class Order(db.Model):
+    __tablename__ = "orders"
+    id = db.Column(db.Integer, primary_key=True)
+    customer_name = db.Column(db.String(120))
+    customer_email = db.Column(db.String(120))
+    customer_phone = db.Column(db.String(30))
+    order_details = db.Column(db.Text)
+    delivery_required = db.Column(db.Boolean, default=False)
+    delivery_address = db.Column(db.String(255), nullable=True)
+    order_date = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default="pending")
+    
+    # Relationship to delivery (one-to-one)
+    delivery = db.relationship('Delivery', backref='order', uselist=False, cascade='all, delete-orphan')
 
-    def __init__(self, customer_id=None, order_date=None, total_amount=0, status="pending", delivery_address=None):
-        self.customer_id = customer_id
-        if order_date is not None:
-            self.order_date = order_date
-        self.total_amount = total_amount
-        self.status = status
+    def __init__(self, customer_name=None, customer_email=None, customer_phone=None, order_details=None, delivery_required=False, delivery_address=None):
+        self.customer_name = customer_name
+        self.customer_email = customer_email
+        self.customer_phone = customer_phone
+        self.order_details = order_details
+        self.delivery_required = delivery_required
         self.delivery_address = delivery_address
 
-
-    #Converts the order object into a dictionary.
-    def to_dict(self, with_children=False):
-        data = {"id": self.id, "customer_id": self.customer_id,
-                "total_amount": str(self.total_amount), "status": self.status,
-                "delivery_address": self.delivery_address}
-        
-        # Includes related items and delivery details if requested.
-        if with_children:    
-            data["items"] = [i.to_dict() for i in self.items]
-            data["delivery"] = self.delivery.to_dict() if self.delivery else None
-        return data   # Returns the order data.
-
-
-
-# Represents an individual product within an order,
-class OrderItem(db.Model):                                             # Database table name.
-    __tablename__ = "order_items"                                      # Unique identifier for each order item.
-    id = db.Column(db.Integer, primary_key=True)                       # Links the item to an order.
-    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"))       # Links the item to an order.
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id"))   # Links the item to a product.
-    product = db.relationship("Product")                               # Creates a relationship with the Product model.
-    quantity = db.Column(db.Integer)                                   # Stores the quantity of the product ordered.
-    unit_price = db.Column(db.Numeric(10, 2))                          # Stores the price of one unit of the product.
-    sub_total = db.Column(db.Numeric(10, 2))                           # Stores the total cost for this item (quantity × unit price).
-
-    def __init__(self, order_id=None, product_id=None, quantity=None, unit_price=None, sub_total=None):
-        self.order_id = order_id
-        self.product_id = product_id
-        self.quantity = quantity
-        self.unit_price = unit_price
-        self.sub_total = sub_total
-
-    # Converts the order item object into a dictionary.
+    # Converts the order object into a dictionary.
     def to_dict(self):
-        return {"id": self.id, 
-                "product_id": self.product_id,
-                "quantity": self.quantity, 
-                "unit_price": str(self.unit_price),
-                "sub_total": str(self.sub_total)
-                }
+        return {
+            "id": self.id,
+            "customer_name": self.customer_name,
+            "customer_email": self.customer_email,
+            "customer_phone": self.customer_phone,
+            "order_details": self.order_details,
+            "delivery_required": self.delivery_required,
+            "delivery_address": self.delivery_address,
+            "order_date": self.order_date.isoformat() if self.order_date else None,
+            "status": self.status,
+            "delivery_status": self.delivery.status if self.delivery else None
+        }

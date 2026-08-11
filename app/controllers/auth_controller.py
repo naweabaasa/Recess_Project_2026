@@ -25,18 +25,8 @@ def login():
     if not admin or not admin.check_password(data.get("password", "")):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    # Creates extra information stored inside the JWT token.
-    # Includes admin role and assigned permissions.
-    claims = {
-        "role": admin.role.name,
-        "permissions": [p.code for p in admin.role.permissions]
-    }
-
     # Generate JWT access token using admin ID as identity.
-    token = create_access_token(
-        identity=str(admin.id),
-        additional_claims=claims
-    )
+    token = create_access_token(identity=str(admin.id))
 
     # Return admin details and login token
     return jsonify({

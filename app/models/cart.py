@@ -4,17 +4,17 @@ from app.extensions import db     # Imports the database instance
 class ShoppingCart(db.Model):                                                            # Defines the ShoppingCart model.
     __tablename__ = "shopping_carts"                                                     # Database table name.
     id = db.Column(db.Integer, primary_key=True)                                         # Unique identifier for each shopping cart.
-    customer_id = db.Column(db.Integer, db.ForeignKey("customers.id"), unique=True)      # Links the cart to a customer (one cart per customer).
+    session_id = db.Column(db.String(255), unique=True)                                  # Links the cart to a guest session.
     items = db.relationship("CartItem", backref="cart", cascade="all, delete-orphan")    # Creates a relationship with CartItem and deletes items when the cart is deleted.
 
-    def __init__(self, customer_id=None):
-        self.customer_id = customer_id
+    def __init__(self, session_id=None):
+        self.session_id = session_id
 
     # Converts the shopping cart object into a dictionary.
     def to_dict(self):
         return {
             "id": self.id,
-            "customer_id": self.customer_id,
+            "session_id": self.session_id,
             "items": [i.to_dict() for i in self.items]
         }
 

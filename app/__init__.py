@@ -8,7 +8,7 @@ from app.extensions import db, migrate, jwt, cors, bcrypt    # Imports initializ
 
 from app import models  # Imports database models so Flask-Migrate can detect them.
 
-
+import logging
 
 def create_app(env_name=None):   # Application factory function that creates and configures the Flask app.
 
@@ -17,6 +17,12 @@ def create_app(env_name=None):   # Application factory function that creates and
     env_name = env_name or os.environ.get("FLASK_ENV", "development")
     app = Flask(__name__)                                 # Creates a new Flask application instance.
     app.config.from_object(config_by_name[env_name])      # Loads configuration settings based on the selected environment.
+
+    # Configure logging for production
+    if env_name == "production":
+        logging.basicConfig(level=logging.INFO)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info("BreadWise Backend starting in production mode")
 
 
     db.init_app(app)                  # Initializes SQLAlchemy with the Flask app.

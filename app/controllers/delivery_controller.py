@@ -13,9 +13,11 @@ delivery_bp = Blueprint("deliveries", __name__, url_prefix="/api/deliveries")
 @delivery_bp.route("", methods=["GET"])
 @permission_required("manage_delivery")
 def list_deliveries():
-
+    # Load deliveries with their related orders
+    deliveries = Delivery.query.join(Delivery.order).all()
+    
     # Return all deliveries as JSON.
-    return jsonify([d.to_dict() for d in Delivery.query.all()]), 200
+    return jsonify([d.to_dict() for d in deliveries]), 200
 
 
 # Creates a new delivery record.
@@ -27,7 +29,6 @@ def create_delivery():
     delivery = Delivery(                                 # Create a new delivery object.
         order_id=data.get("order_id"),
         delivery_address=data.get("delivery_address"),
-        delivery_fee=data.get("delivery_fee", 0),
         status=data.get("status", "pending")
     )
 
