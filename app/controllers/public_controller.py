@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 # Blueprint creates routes,
 # jsonify returns JSON responses.
 
-from app.models import Category, Brand, Product, PageContent  # Import database models.
+from app.models import Category, Product, PageContent  # Import database models.
 
 
 # Create Public Blueprint.
@@ -15,15 +15,6 @@ def categories():
     return jsonify([
         c.to_dict()
         for c in Category.query.filter_by(status="active").all()
-    ]), 200
-
-
-# Displays all active brands.
-@public_bp.route("/brands", methods=["GET"])
-def brands():
-    return jsonify([
-        b.to_dict()
-        for b in Brand.query.filter_by(status="active").all()
     ]), 200
 
 

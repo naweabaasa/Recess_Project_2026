@@ -2,13 +2,9 @@ from app.models.admin import Admin  # Imports the Admin model.
 
 from app.models.category import Category  # Imports the Category model.
 
-from app.models.brand import Brand  # Imports the Brand model.
-
 from app.models.product import Product    # Imports the Product model.
 
 from app.models.page_content import PageContent  # Imports the PageContent model.
-
-from app.models.cart import ShoppingCart, CartItem  # Imports the ShoppingCart and CartItem models.
 
 from app.models.order import Order  # Imports the Order model.
 

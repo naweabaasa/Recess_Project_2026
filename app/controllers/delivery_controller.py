@@ -9,9 +9,9 @@ delivery_bp = Blueprint("deliveries", __name__, url_prefix="/api/deliveries")
 
 
 # Retrieves all delivery records.
-# Requires "manage_delivery" permission.
+# Requires "manage_deliveries" permission.
 @delivery_bp.route("", methods=["GET"])
-@permission_required("manage_delivery")
+@permission_required("manage_deliveries")
 def list_deliveries():
     # Load deliveries with their related orders
     deliveries = Delivery.query.join(Delivery.order).all()
@@ -22,7 +22,7 @@ def list_deliveries():
 
 # Creates a new delivery record.
 @delivery_bp.route("", methods=["POST"])
-@permission_required("manage_delivery")
+@permission_required("manage_deliveries")
 def create_delivery():
 
     data = request.get_json() or {}                      # Get delivery data from request body.
@@ -39,7 +39,7 @@ def create_delivery():
 
 # Updates an existing delivery status and date.
 @delivery_bp.route("/<int:delivery_id>", methods=["PUT"])
-@permission_required("manage_delivery")
+@permission_required("manage_deliveries")
 def update_delivery(delivery_id):
 
     delivery = Delivery.query.get_or_404(delivery_id)       # Find delivery by ID or return 404 if not found.

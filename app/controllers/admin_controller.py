@@ -33,7 +33,10 @@ def list_admins():
 @login_required
 def create_admin():
 
-    data = request.get_json() or {}                        # Get JSON data from client
+    data = request.get_json(force=True, silent=False)      # Force JSON parsing and show errors
+    
+    if data is None:
+        return jsonify({"error": "Invalid JSON or no data provided"}), 400
 
     # INPUT VALIDATION: Check if required fields are provided
 
@@ -82,6 +85,8 @@ def create_admin():
             "error": "Database error",
             "message": "Failed to create admin account. Please try again later."
         }), 500
+
+
 
 
 # Updates existing admin information.

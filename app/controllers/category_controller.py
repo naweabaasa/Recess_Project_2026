@@ -28,12 +28,15 @@ def list_categories():
 @category_bp.route("", methods=["POST"])
 @permission_required("manage_categories")
 def create_category():
+    from flask_jwt_extended import get_jwt_identity
+    
+    admin_id = int(get_jwt_identity())  # Get logged-in admin ID from JWT token
 
     data = request.get_json() or {}              # Get category data from request body.
     category = Category(                         # Create a new category object.
         name=data.get("name"),
-        description=data.get("description"),
-        status=data.get("status", "active")
+        status=data.get("status", "active"),
+        admin_id=admin_id  # Track which admin created this category
     )
 
     # Save category to database.
@@ -54,7 +57,6 @@ def update_category(category_id):
     data = request.get_json() or {}                       # Get updated information.
     # Update category fields.
     category.name = data.get("name", category.name)
-    category.description = data.get("description", category.description)
     category.status = data.get("status", category.status)
 
     db.session.commit()    # Save changes.

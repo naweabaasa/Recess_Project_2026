@@ -7,6 +7,8 @@ class Category(db.Model):                                          # Defines the
     id = db.Column(db.Integer, primary_key=True)                   # Unique identifier for each category.
     name = db.Column(db.String(100), unique=True, nullable=False)  # Stores the category name (must be unique).
     status = db.Column(db.String(20), default="active")            # Stores the category status (defaults to "active").
+    admin_id = db.Column(db.Integer, db.ForeignKey("admins.id"))   # Tracks which admin created this category.
+    admin = db.relationship("Admin")                               # Creates a relationship with the Admin model.
     
     # TIMESTAMP FIELDS: Track when categories are created and updated
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -15,9 +17,10 @@ class Category(db.Model):                                          # Defines the
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     # Automatically update to current time when category is modified
 
-    def __init__(self, name=None, status="active"):
+    def __init__(self, name=None, status="active", admin_id=None):
         self.name = name
         self.status = status
+        self.admin_id = admin_id
 
      # Converts the category object into a dictionaryfor API responses.
     def to_dict(self):

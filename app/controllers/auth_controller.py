@@ -25,8 +25,22 @@ def login():
     if not admin or not admin.check_password(data.get("password", "")):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    # Generate JWT access token using admin ID as identity.
-    token = create_access_token(identity=str(admin.id))
+    # Define all permissions that admins have access to
+    # Since all logged-in admins should have full access, we grant all permissions
+    all_permissions = [
+        "manage_categories",
+        "manage_products",
+        "manage_orders",
+        "manage_deliveries",
+        "manage_page_content",
+        "manage_admins"
+    ]
+    
+    # Generate JWT access token with admin ID and all permissions
+    token = create_access_token(
+        identity=str(admin.id),
+        additional_claims={"permissions": all_permissions}
+    )
 
     # Return admin details and login token
     return jsonify({

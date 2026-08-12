@@ -34,8 +34,6 @@ def create_product():
     product = Product(                        # Create a new product object.
         name=data.get("name"),
         category_id=data.get("category_id"),
-        brand_id=data.get("brand_id"),
-        description=data.get("description"),
         image_url=data.get("image_url"),
         status=data.get("status", "draft"),
         admin_id=admin_id,  # Use the real admin ID from JWT token (audit trail!)
@@ -49,11 +47,11 @@ def create_product():
     
     except IntegrityError as e:
         # IntegrityError might happen if invalid foreign keys are used
-        # For example: category_id or brand_id that doesn't exist
+        # For example: category_id that doesn't exist
         db.session.rollback()
         return jsonify({
             "error": "Database integrity error",
-            "message": "Invalid category or brand ID. Please check your input."
+            "message": "Invalid category ID. Please check your input."
         }), 400
     
     except SQLAlchemyError as e:
@@ -75,8 +73,6 @@ def update_product(product_id):
     for field in [                                   # Update only fields provided in the request.
         "name",
         "category_id",
-        "brand_id",
-        "description",
         "image_url",
         "status"
     ]:
@@ -92,7 +88,7 @@ def update_product(product_id):
         db.session.rollback()
         return jsonify({
             "error": "Database integrity error",
-            "message": "Invalid category or brand ID. Please check your input."
+            "message": "Invalid category ID. Please check your input."
         }), 400
     
     except SQLAlchemyError as e:
