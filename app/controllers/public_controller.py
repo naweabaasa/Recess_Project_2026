@@ -32,6 +32,15 @@ def product_detail(product_id):
         Product.query.get_or_404(product_id).to_dict()
     ), 200   # Find product by ID or return 404 if not found.
 
+# Get content for all public pages in one response
+@public_bp.route("/pages", methods=["GET"])
+def get_all_page_content():
+    rows = PageContent.query.order_by(PageContent.page_name, PageContent.section_key).all()
+    result = {}
+    for row in rows:
+        result.setdefault(row.page_name, {})[row.section_key] = row.content
+    return jsonify(result), 200
+
 # Get page content for a specific public page (e.g. home, about)
 @public_bp.route("/pages/<page_name>", methods=["GET"])
 def get_page_content(page_name):

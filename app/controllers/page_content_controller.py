@@ -6,6 +6,15 @@ from app.utils.decorators import permission_required
 # Create Page Content Blueprint for Admin
 page_content_bp = Blueprint("page_content", __name__, url_prefix="/api/pages")
 
+@page_content_bp.route("", methods=["GET"])
+@permission_required("manage_pages", "manage_products", "manage_orders")
+def get_all_page_content():
+    rows = PageContent.query.order_by(PageContent.page_name, PageContent.section_key).all()
+    result = {}
+    for row in rows:
+        result.setdefault(row.page_name, {})[row.section_key] = row.content
+    return jsonify(result), 200
+
 @page_content_bp.route("/<page_name>", methods=["GET"])
 # Depending on permission granularity, using a general admin role or specific permission.
 # We will just use the decorator with an empty string or a generic permission if not strictly defined.
