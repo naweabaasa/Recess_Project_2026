@@ -82,3 +82,32 @@ def upload_hero_image():
         return jsonify({"message": "Hero image uploaded successfully", "image_url": image_url}), 201
     except Exception as e:
         return jsonify({"error": f"Failed to upload hero image: {str(e)}"}), 500
+
+
+@upload_bp.route("/order-inspiration", methods=["POST"])
+def upload_order_inspiration():
+    """
+    Upload an optional inspiration image attached to a customer order.
+
+    This route is PUBLIC — no authentication required since customers
+    don't have accounts. Saved under /images/orders/.
+
+    Expects:
+    - A file in the 'image' field of a multipart/form-data request
+
+    Returns:
+    - JSON with the image URL path
+    """
+    if 'image' not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+    if not allowed_file(file.filename):
+        return jsonify({"error": "Invalid file type. Allowed: png, jpg, jpeg, gif, webp"}), 400
+
+    try:
+        image_url = _save_upload(file, "orders")
+        return jsonify({"message": "Inspiration image uploaded successfully", "image_url": image_url}), 201
+    except Exception as e:
+        return jsonify({"error": f"Failed to upload inspiration image: {str(e)}"}), 500

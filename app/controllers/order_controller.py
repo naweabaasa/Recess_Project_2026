@@ -20,7 +20,8 @@ def create_order():
         customer_phone=data.get("phone"),
         order_details=data.get("orderDetails"),
         delivery_required=data.get("deliveryRequired", False),
-        delivery_address=data.get("deliveryAddress")
+        delivery_address=data.get("deliveryAddress"),
+        inspiration_image=data.get("inspirationImage")  # Optional inspiration photo URL
     )
 
     try:
