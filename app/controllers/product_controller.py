@@ -16,8 +16,57 @@ product_bp = Blueprint("products", __name__, url_prefix="/api/products")
 @permission_required("manage_products")
 def list_products():
 
-    # Return all products as JSON.
-    return jsonify([p.to_dict() for p in Product.query.all()]), 200
+    # Return all products as JSON, ordered newest first.
+    return jsonify([p.to_dict() for p in Product.query.order_by(Product.id.desc()).all()]), 200
+
+
+# Retrieves a single product by ID.
+@product_bp.route("/<int:product_id>", methods=["GET"])
+@permission_required("manage_products")
+def get_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    return jsonify(product.to_dict()), 200
+
+
+# Batch imports products from JSON list
+@product_bp.route("/import", methods=["POST"])
+@permission_required("manage_products")
+def import_products():
+    admin_id = int(get_jwt_identity())
+    data = request.get_json() or {}
+    items = data.get("products", [])
+    if not isinstance(items, list) or len(items) == 0:
+        return jsonify({"error": "No products provided for import"}), 400
+
+    imported_count = 0
+    errors = []
+
+    for idx, item in enumerate(items):
+        name = item.get("name")
+        if not name:
+            errors.append(f"Row {idx + 1}: Name is required")
+            continue
+
+        product = Product(
+            name=name,
+            category_id=item.get("category_id") or None,
+            image_url=item.get("image_url") or "",
+            status=item.get("status") or "active",
+            admin_id=admin_id
+        )
+        db.session.add(product)
+        imported_count += 1
+
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": f"Successfully imported {imported_count} products",
+            "imported_count": imported_count,
+            "errors": errors
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to import products", "details": str(e)}), 500
 
 
 # Creates a new product.
