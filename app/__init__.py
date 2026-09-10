@@ -33,6 +33,11 @@ def create_app(env_name=None):   # Application factory function that creates and
 
 
 
+    # Health check endpoint for Render
+    @app.route("/api/health")
+    def health():
+        return {"status": "ok"}, 200
+
     # Blue print registration
     from app.controllers import all_blueprints    # Imports all application blueprints.
     for bp in all_blueprints:
