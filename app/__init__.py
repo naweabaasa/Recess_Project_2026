@@ -31,6 +31,16 @@ def create_app(env_name=None):   # Application factory function that creates and
     bcrypt.init_app(app)              # Initializes password hashing with Bcrypt.
     cors.init_app(app)                # Enables Cross-Origin Resource Sharing (CORS).
 
+    # Configure SQLAlchemy engine options for shared MySQL hosting
+    # (keeps pooled connections alive and validates them before use)
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,
+        'pool_recycle': 280,
+        'pool_timeout': 30,
+        'pool_size': 5,
+        'max_overflow': 10,
+    }
+
 
 
     # Health check endpoint for Render
