@@ -51,7 +51,5 @@ def login():
         }), 200
     except Exception as e:
         error_msg = f"{type(e).__name__}: {str(e)}"
-        traceback_str = traceback.format_exc()
         print("LOGIN ERROR:", error_msg)
-        print(traceback_str)
-        return jsonify({"error": "Server error", "details": error_msg, "traceback": traceback_str}), 500
+        return jsonify({"error": "Server error", "details": error_msg}), 500
