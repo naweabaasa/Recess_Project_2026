@@ -5,14 +5,11 @@
 
 from app import create_app             # Import function that creates and configures the Flask application.
 from app.extensions import db          # Import database connection.
-from app.models import Admin, Category, Brand, Product, PageContent   # Import database models.
+from app.models import Admin, Category, Product, PageContent   # Import database models.
 
 
 # ─── Categories ────────────────────────────────────────────────────────────────
 CATEGORIES = ["Bread", "Donuts", "Muffins", "Cakes"]
-
-# ─── Brands ────────────────────────────────────────────────────────────────────
-BRANDS = ["BreadWise Bakery", "SunRise Bakes", "Golden Grain"]
 
 # ─── Products (matches frontend /public/images/products/ paths) ────────────────
 # Each entry: (name, category_name, image_url)
@@ -103,11 +100,6 @@ def run():
             if not Category.query.filter_by(name=name).first():
                 db.session.add(Category(name=name, status="active"))
 
-        # ── Brands ────────────────────────────────────────────────────────────
-        for name in BRANDS:
-            if not Brand.query.filter_by(name=name).first():
-                db.session.add(Brand(name=name, status="active"))
-
         db.session.flush()   # Flush so category IDs are available below
 
         # ── Products ──────────────────────────────────────────────────────────
@@ -117,13 +109,10 @@ def run():
                 continue
 
             category = Category.query.filter_by(name=cat_name).first()
-            brand    = Brand.query.filter_by(name="BreadWise Bakery").first()
 
             product = Product(
                 name=name,
                 category_id=category.id if category else None,
-                brand_id=brand.id if brand else None,
-                description=f"Freshly baked {name.lower()} made with the finest ingredients.",
                 image_url=image_url,
                 status="active",   # active so the public API returns them
                 admin_id=admin_id,
